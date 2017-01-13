@@ -2,6 +2,7 @@ package com.github.steevedroz.reactiondiffusion;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.PixelWriter;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
 public class ReactionDiffusion extends Canvas {
@@ -25,28 +26,8 @@ public class ReactionDiffusion extends Canvas {
 	    }
 	}
 
-	setOnMouseDragged((event) -> {
-	    PixelWriter pixelWriter = getGraphicsContext2D().getPixelWriter();
-	    double newA = 0;
-	    double newB = 0;
-	    if (event.isPrimaryButtonDown()) {
-		newA = 0;
-		newB = 1;
-	    } else if (event.isSecondaryButtonDown()) {
-		newA = 1;
-		newB = 0;
-	    }
-	    for (int x = 0; x < width; x++) {
-		for (int y = 0; y < height; y++) {
-		    if (distance(x, y, event.getX(), event.getY()) < 3) {
-			current[x][y].a = newA;
-			current[x][y].b = newB;
-			double value = normalize(current[x][y].a - current[x][y].b);
-			pixelWriter.setColor(x, y, new Color(value, value, value, 1));
-		    }
-		}
-	    }
-	});
+	setOnMousePressed((event) -> drawPixels(event));
+	setOnMouseDragged((event) -> drawPixels(event));
     }
 
     public void show() {
@@ -83,6 +64,29 @@ public class ReactionDiffusion extends Canvas {
 		current[x][y] = new Cell(1, 0);
 		next[x][y] = new Cell(1, 0);
 		pixelWriter.setColor(x, y, Color.WHITE);
+	    }
+	}
+    }
+
+    private void drawPixels(MouseEvent event) {
+	PixelWriter pixelWriter = getGraphicsContext2D().getPixelWriter();
+	double newA = 0;
+	double newB = 0;
+	if (event.isPrimaryButtonDown()) {
+	    newA = 0;
+	    newB = 1;
+	} else if (event.isSecondaryButtonDown()) {
+	    newA = 1;
+	    newB = 0;
+	}
+	for (int x = 0; x < getWidth(); x++) {
+	    for (int y = 0; y < getHeight(); y++) {
+		if (distance(x, y, event.getX(), event.getY()) < 3) {
+		    current[x][y].a = newA;
+		    current[x][y].b = newB;
+		    double value = normalize(current[x][y].a - current[x][y].b);
+		    pixelWriter.setColor(x, y, new Color(value, value, value, 1));
+		}
 	    }
 	}
     }
