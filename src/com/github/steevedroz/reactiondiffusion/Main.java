@@ -45,13 +45,13 @@ public class Main extends Application {
 	    ScrollBar dB = new ScrollBar();
 	    Label dBValue = new Label("" + rd.dB);
 
-	    dB.setMin(0.1);
-	    dB.setMax(0.5);
-	    dB.setValue(rd.dB);
+	    dB.setMin(10);
+	    dB.setMax(50);
+	    dB.setValue(rd.dB * 100);
 	    dB.setPrefWidth(200);
 	    dB.valueProperty().addListener((observableValue, oldValue, newValue) -> {
-		rd.dB = (double) newValue;
-		dBValue.setText("" + newValue);
+		rd.dB = (double) (newValue.intValue() / 100.0);
+		dBValue.setText("" + rd.dB);
 	    });
 
 	    dBValue.setMaxWidth(50);

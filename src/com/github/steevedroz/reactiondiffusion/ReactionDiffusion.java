@@ -43,11 +43,6 @@ public class ReactionDiffusion extends Canvas {
     public void update() {
 	for (int x = 0; x < getWidth(); x++) {
 	    for (int y = 0; y < getHeight(); y++) {
-		if (x == 0 || x == getWidth() - 1 || y == 0 || y == getHeight() - 1) {
-		    next[x][y].a = 1;
-		    next[x][y].b = 0;
-		    continue;
-		}
 		double a = current[x][y].a;
 		double b = current[x][y].b;
 		next[x][y].a = normalize(a + (dA * laplaceA(x, y) - a * b * b + f * (1 - a)) * dT);
@@ -93,29 +88,33 @@ public class ReactionDiffusion extends Canvas {
 
     private double laplaceA(int x, int y) {
 	double laplace = 0;
+	int width = (int) getWidth();
+	int height = (int) getHeight();
 	laplace += current[x][y].a * -1;
-	laplace += current[x][y - 1].a * 0.2;
-	laplace += current[x][y + 1].a * 0.2;
-	laplace += current[x - 1][y].a * 0.2;
-	laplace += current[x + 1][y].a * 0.2;
-	laplace += current[x - 1][y - 1].a * 0.05;
-	laplace += current[x - 1][y + 1].a * 0.05;
-	laplace += current[x + 1][y - 1].a * 0.05;
-	laplace += current[x + 1][y + 1].a * 0.05;
+	laplace += current[x][modulo(y - 1, height)].a * 0.2;
+	laplace += current[x][modulo(y + 1, height)].a * 0.2;
+	laplace += current[modulo(x - 1, width)][y].a * 0.2;
+	laplace += current[modulo(x + 1, width)][y].a * 0.2;
+	laplace += current[modulo(x - 1, width)][modulo(y - 1, height)].a * 0.05;
+	laplace += current[modulo(x - 1, width)][modulo(y + 1, height)].a * 0.05;
+	laplace += current[modulo(x + 1, width)][modulo(y - 1, height)].a * 0.05;
+	laplace += current[modulo(x + 1, width)][modulo(y + 1, height)].a * 0.05;
 	return laplace;
     }
 
     private double laplaceB(int x, int y) {
 	double laplace = 0;
+	int width = (int) getWidth();
+	int height = (int) getHeight();
 	laplace += current[x][y].b * -1;
-	laplace += current[x][y - 1].b * 0.2;
-	laplace += current[x][y + 1].b * 0.2;
-	laplace += current[x - 1][y].b * 0.2;
-	laplace += current[x + 1][y].b * 0.2;
-	laplace += current[x - 1][y - 1].b * 0.05;
-	laplace += current[x - 1][y + 1].b * 0.05;
-	laplace += current[x + 1][y - 1].b * 0.05;
-	laplace += current[x + 1][y + 1].b * 0.05;
+	laplace += current[x][modulo(y - 1, height)].b * 0.2;
+	laplace += current[x][modulo(y + 1, height)].b * 0.2;
+	laplace += current[modulo(x - 1, width)][y].b * 0.2;
+	laplace += current[modulo(x + 1, width)][y].b * 0.2;
+	laplace += current[modulo(x - 1, width)][modulo(y - 1, height)].b * 0.05;
+	laplace += current[modulo(x - 1, width)][modulo(y + 1, height)].b * 0.05;
+	laplace += current[modulo(x + 1, width)][modulo(y - 1, height)].b * 0.05;
+	laplace += current[modulo(x + 1, width)][modulo(y + 1, height)].b * 0.05;
 	return laplace;
     }
 
@@ -131,5 +130,12 @@ public class ReactionDiffusion extends Canvas {
 
     private double normalize(double value) {
 	return Math.min(Math.max(value, 0), 1);
+    }
+
+    private int modulo(int value, int module) {
+	while (value < 0) {
+	    value += module;
+	}
+	return value % module;
     }
 }
